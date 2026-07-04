@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="A free personalised Vedic astrology (Jyotish) reading — birth chart, nakshatra, dasha life chapters, yogas, and current transits. Calculated in your browser.">
+<meta property="og:title" content="Your Vedic Stars ✨">
+<meta property="og:description" content="A personalised reading from the ancient tradition of Jyotish — birth chart, life chapters, and what the sky holds right now.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
 <title>Your Vedic Stars ✨</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -70,6 +75,7 @@ select option{background:#180838;color:var(--text);}
 .badge{display:inline-block;background:rgba(245,215,122,.12);border:1px solid rgba(245,215,122,.35);border-radius:20px;padding:.3rem 1rem;color:var(--gold);font-size:.8rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin:.2rem;}
 .back-btn{background:none;border:none;color:var(--muted);font-family:'Inter',sans-serif;font-size:.9rem;cursor:pointer;padding:.5rem 0;display:inline-flex;align-items:center;gap:.4rem;margin-bottom:.5rem;transition:color .2s;}
 .back-btn:hover{color:var(--gold);}
+.toolbar{display:flex;justify-content:space-between;align-items:center;}
 
 /* SECTION */
 .section{margin-bottom:2.5rem;}
@@ -102,6 +108,19 @@ select option{background:#180838;color:var(--text);}
 .good{color:var(--good);}
 .warn{color:var(--warn);}
 .weak{color:var(--bad);}
+.nak-small{font-size:.72rem;color:var(--muted);}
+.rx{color:var(--node);font-weight:700;font-size:.75rem;}
+
+/* YOGA CARDS */
+.yoga-grid{display:grid;gap:.75rem;}
+.yoga-card{background:linear-gradient(135deg,rgba(245,215,122,.07),rgba(160,130,240,.05));border:1px solid rgba(245,215,122,.22);border-radius:14px;padding:1rem 1.25rem;}
+.yoga-name{font-family:'Playfair Display',serif;color:var(--gold);font-size:1rem;margin-bottom:.3rem;}
+.yoga-desc{font-size:.87rem;color:#c0b8d8;line-height:1.65;}
+
+/* PLACEMENTS */
+.placement{padding:.7rem 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.9rem;color:#c8c0e0;line-height:1.7;}
+.placement:last-child{border-bottom:none;}
+.placement strong{color:var(--text);}
 
 /* TIMELINE */
 .timeline{position:relative;padding-left:0;}
@@ -116,6 +135,7 @@ select option{background:#180838;color:var(--text);}
 .tl-item.past .tl-label{color:var(--muted);}
 .tl-dates{font-size:.78rem;color:var(--muted);margin-bottom:.35rem;}
 .tl-desc{font-size:.87rem;color:#b5aed0;line-height:1.65;}
+.tl-personal{font-size:.85rem;color:#d0b878;line-height:1.6;margin-top:.4rem;font-style:italic;}
 
 /* YEAR CARDS */
 .year-grid{display:grid;gap:.75rem;}
@@ -147,15 +167,13 @@ select option{background:#180838;color:var(--text);}
 @media print{
   body{background:#fff;color:#222;}
   body::before{display:none;}
-  .back-btn,.badge{display:none;}
+  .back-btn,.badge,.toolbar{display:none;}
 }
 </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════
-     SCREEN 1: FORM
-══════════════════════════════════════════ -->
+<!-- SCREEN 1: FORM -->
 <div id="form-screen" class="screen active form-screen">
   <h1 class="hero-title">✨ Your Vedic Stars</h1>
   <p class="hero-sub">A personalised reading from the ancient tradition of Jyotish</p>
@@ -195,7 +213,7 @@ select option{background:#180838;color:var(--text);}
         <option value="-7">UTC−7 (Denver / Mountain)</option>
         <option value="-6">UTC−6 (Chicago / Central)</option>
         <option value="-5">UTC−5 (New York / Eastern)</option>
-        <option value="-4.5">UTC−4:30 (Venezuela)</option>
+        <option value="-4.5">UTC−4:30 (Venezuela pre-2016)</option>
         <option value="-4">UTC−4 (Atlantic / Toronto DST)</option>
         <option value="-3.5">UTC−3:30 (Newfoundland)</option>
         <option value="-3">UTC−3 (Brazil / Buenos Aires)</option>
@@ -209,12 +227,12 @@ select option{background:#180838;color:var(--text);}
         <option value="4">UTC+4 (Dubai / Baku)</option>
         <option value="4.5">UTC+4:30 (Kabul)</option>
         <option value="5">UTC+5 (Karachi / Islamabad)</option>
-        <option value="5.5" selected>UTC+5:30 (India / Sri Lanka)</option>
+        <option value="5.5">UTC+5:30 (India / Sri Lanka)</option>
         <option value="5.75">UTC+5:45 (Nepal)</option>
         <option value="6">UTC+6 (Dhaka / Almaty)</option>
         <option value="6.5">UTC+6:30 (Yangon)</option>
         <option value="7">UTC+7 (Bangkok / Jakarta)</option>
-        <option value="8">UTC+8 (Manila / Singapore / Beijing)</option>
+        <option value="8" selected>UTC+8 (Manila / Singapore / Beijing)</option>
         <option value="8.75">UTC+8:45 (Eucla)</option>
         <option value="9">UTC+9 (Tokyo / Seoul)</option>
         <option value="9.5">UTC+9:30 (Adelaide / Darwin)</option>
@@ -228,25 +246,24 @@ select option{background:#180838;color:var(--text);}
       </select>
     </div>
     <div id="form-error" class="error-msg"></div>
-    <button class="btn" onclick="submitForm()">Cast My Chart ✨</button>
+    <button class="btn" id="submit-btn" onclick="submitForm()">Cast My Chart ✨</button>
   </div>
-  <p class="form-footer">Calculations use the Vedic (Lahiri) system. Birth time affects the rising sign and life-chapter start dates — enter as accurately as you can.</p>
+  <p class="form-footer">Calculations use the sidereal Vedic (Lahiri) system, computed entirely in your browser. Birth time affects the rising sign and life-chapter start dates — enter it as accurately as you can. If your birthplace used daylight saving time on your birth date, choose the DST offset.</p>
 </div>
 
-<!-- ══════════════════════════════════════════
-     SCREEN 2: LOADING
-══════════════════════════════════════════ -->
+<!-- SCREEN 2: LOADING -->
 <div id="loading-screen" class="screen">
   <div class="spinner"></div>
   <div class="loading-title">Reading the stars…</div>
   <div class="loading-sub" id="loading-msg">Locating birthplace…</div>
 </div>
 
-<!-- ══════════════════════════════════════════
-     SCREEN 3: READING
-══════════════════════════════════════════ -->
+<!-- SCREEN 3: READING -->
 <div id="reading-screen" class="screen">
-  <button class="back-btn" onclick="showScreen('form-screen')">← New Reading</button>
+  <div class="toolbar">
+    <button class="back-btn" onclick="showScreen('form-screen')">← New Reading</button>
+    <button class="back-btn" onclick="window.print()">🖨 Print / Save PDF</button>
+  </div>
   <div id="reading-content"></div>
 </div>
 
@@ -272,6 +289,34 @@ const DASHA_YEARS = {Ketu:7,Venus:20,Sun:6,Moon:10,Mars:7,Rahu:18,Jupiter:16,Sat
 
 const PLANET_ABBR = {Sun:'Su',Moon:'Mo',Mars:'Ma',Mercury:'Me',Jupiter:'Ju',Venus:'Ve',Saturn:'Sa',Rahu:'Ra',Ketu:'Ke'};
 const PLANET_CLASS = {Sun:'l',Moon:'l',Jupiter:'b',Venus:'b',Mercury:'b',Mars:'m',Saturn:'m',Rahu:'n',Ketu:'n'};
+const ORD = ['','1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'];
+
+const HOUSE_THEMES = ['',
+  'self, body, and personal direction',
+  'money, family, speech, and what you truly value',
+  'courage, communication, siblings, and self-made effort',
+  'home, mother, emotional foundations, and property',
+  'creativity, children, romance, and intelligence',
+  'daily work, health, service, and overcoming obstacles',
+  'marriage, partnership, and one-to-one relationships',
+  'transformation, shared resources, and life’s deeper mysteries',
+  'fortune, belief, higher learning, and long journeys',
+  'career, public standing, and life mission',
+  'gains, income, friendships, and aspirations',
+  'letting go, foreign lands, spirituality, and inner retreat'
+];
+
+const PLANET_ESSENCE = {
+  Sun:     'your core identity, vitality, and sense of authority',
+  Moon:    'your mind, moods, and emotional needs',
+  Mars:    'your drive, courage, and capacity to act',
+  Mercury: 'your intellect, speech, and commercial instincts',
+  Jupiter: 'your growth, fortune, and wisdom',
+  Venus:   'your love nature, pleasures, and sense of beauty',
+  Saturn:  'your discipline, patience, and life lessons',
+  Rahu:    'your worldly hunger and unconventional ambition',
+  Ketu:    'your detachment, intuition, and past-life mastery'
+};
 
 // ── Lagna personality descriptions ──
 const LAGNA_PERSONA = [
@@ -327,117 +372,118 @@ const LAGNA_PERSONA = [
 
 // ── Moon sign emotional nature ──
 const MOON_NATURE = [
-  'Your emotional responses are immediate and intense. You feel things quickly and need to act on those feelings just as fast. You are most emotionally fulfilled when you feel free and independent, and most unsettled when you feel trapped or overlooked.',
-  'You have a deep need for emotional stability, comfort, and continuity. Change unsettles you until you can see that the new reality is solid and lasting. You show affection through tangible acts of care — cooking, providing, making things comfortable.',
-  'Your inner world is lively and curious. You process emotions by talking about them, and you need a partner who can engage your mind as well as your heart. Boredom is genuinely emotionally destabilising for you.',
-  'You feel with extraordinary depth and carry the moods of people around you. Home is your sanctuary. When your domestic world is in order, everything else flows; when it is disrupted, everything else suffers.',
-  'You need to feel seen and appreciated to feel emotionally secure. At your best, your warmth and generosity are extraordinary. You thrive when your efforts are acknowledged; you wilt when they are taken for granted.',
-  'You process emotions through analysis. When something upsets you, your first move is to understand exactly what went wrong and how to address it. You show love through practical attention and careful service.',
-  'You need harmony and partnership to feel at ease. Conflict is genuinely uncomfortable, and you will often accommodate others to keep the peace — until the suppressed feelings eventually surface.',
-  'Your feelings run extraordinarily deep, and you love and hurt with an intensity that can surprise people who don't know you well. Loyalty is everything to you. Trust, once broken, takes a very long time to rebuild.',
-  'Your emotional nature is optimistic and expansive. You process difficult feelings by finding the meaning in them, or by physically moving — travel, exercise, getting into nature. You need room to breathe.',
-  'You have learned to manage your emotions with discipline, presenting a composed exterior even when the inner world is turbulent. You show love through reliability, consistency, and showing up when it matters.',
-  'Your emotional life is somewhat detached from the immediate and personal — you care deeply about people in the abstract while sometimes struggling with the messiness of close individual relationships.',
-  'You are one of the most emotionally permeable people in any room. Feelings move through you like water — you absorb and transmute the emotions of those around you, and sometimes can't tell where yours end and theirs begin.'
+  `Your emotional responses are immediate and intense. You feel things quickly and need to act on those feelings just as fast. You are most emotionally fulfilled when you feel free and independent, and most unsettled when you feel trapped or overlooked.`,
+  `You have a deep need for emotional stability, comfort, and continuity. Change unsettles you until you can see that the new reality is solid and lasting. You show affection through tangible acts of care — cooking, providing, making things comfortable.`,
+  `Your inner world is lively and curious. You process emotions by talking about them, and you need a partner who can engage your mind as well as your heart. Boredom is genuinely emotionally destabilising for you.`,
+  `You feel with extraordinary depth and carry the moods of people around you. Home is your sanctuary. When your domestic world is in order, everything else flows; when it is disrupted, everything else suffers.`,
+  `You need to feel seen and appreciated to feel emotionally secure. At your best, your warmth and generosity are extraordinary. You thrive when your efforts are acknowledged; you wilt when they are taken for granted.`,
+  `You process emotions through analysis. When something upsets you, your first move is to understand exactly what went wrong and how to address it. You show love through practical attention and careful service.`,
+  `You need harmony and partnership to feel at ease. Conflict is genuinely uncomfortable, and you will often accommodate others to keep the peace — until the suppressed feelings eventually surface.`,
+  `Your feelings run extraordinarily deep, and you love and hurt with an intensity that can surprise people who don't know you well. Loyalty is everything to you. Trust, once broken, takes a very long time to rebuild.`,
+  `Your emotional nature is optimistic and expansive. You process difficult feelings by finding the meaning in them, or by physically moving — travel, exercise, getting into nature. You need room to breathe.`,
+  `You have learned to manage your emotions with discipline, presenting a composed exterior even when the inner world is turbulent. You show love through reliability, consistency, and showing up when it matters.`,
+  `Your emotional life is somewhat detached from the immediate and personal — you care deeply about people in the abstract while sometimes struggling with the messiness of close individual relationships.`,
+  `You are one of the most emotionally permeable people in any room. Feelings move through you like water — you absorb and transmute the emotions of those around you, and sometimes can't tell where yours end and theirs begin.`
 ];
 
 // ── Nakshatra soul descriptions ──
 const NAK_SOUL = [
-  'Ashwini: A pioneer by nature — you arrive quickly and need to move quickly. Healing and new beginnings are your gifts.',
-  'Bharani: You carry things — weight, responsibility, creative power. Endurance and transformation are yours.',
-  'Krittika: Sharp discernment. You cut through illusion and demand authenticity from yourself and others.',
-  'Rohini: A deep love of beauty, creativity, and the pleasures of the physical world. Magnetic and artistic.',
-  'Mrigashira: A perpetual seeker — always searching, curious, never quite satisfied with what has already been found.',
-  'Ardra: The storm that clears the air. You renew through disruption and possess a fierce, searching intelligence.',
-  'Punarvasu: Return and restoration. You bounce back from difficulties and have a natural gift for teaching and guiding.',
-  'Pushya: The nourisher. You are built to sustain others over long periods — patient, caring, deeply responsible.',
-  'Ashlesha: Serpent wisdom. You see what others prefer not to see, and your intelligence works in subtle, penetrating ways.',
-  'Magha: Royal spirit. You are connected to lineage, ancestry, and a sense of inherited dignity and purpose.',
-  'Purva Phalguni: The art of enjoyment — rest, pleasure, creative luxury. You understand that joy is not a detour from life.',
-  'Uttara Phalguni: The patron. You find meaning in generosity and in building things that benefit others over time.',
-  'Hasta: Skilled hands and intuitive intelligence. You learn by doing and express love through practical craft.',
-  'Chitra: Architectural vision and creative brilliance. You are driven to make something uniquely beautiful.',
-  'Swati: Independence and flexibility — like wind, you resist being pinned down and find your own path naturally.',
-  'Vishakha: Patient, burning ambition. You are willing to work toward a significant goal over a very long horizon.',
-  'Anuradha: Steadfast devotion. You are one of the most loyal friends anyone can have, through long journeys.',
-  'Jyeshtha: Seniority and protection. You take responsibility for those in your care with quiet authority.',
-  'Mula: Root-seeking. You are willing to tear everything down to find the essential truth underneath.',
-  'Purva Ashadha: Invincibility and revival. You can breathe life back into what seems lost — in yourself and others.',
-  'Uttara Ashadha: Final victory. You achieve through righteousness and universally recognised principles.',
-  'Shravana: The listener. You connect worlds through careful attention and the wisdom gained from true hearing.',
-  'Dhanishtha: Rhythm and wealth through action. You move through life with a musical sense of timing.',
-  'Shatabhisha: The healer of secrets. You carry vast knowledge and apply it with quiet, focused precision.',
-  'Purva Bhadrapada: Fierce wisdom. You are willing to sacrifice comfort for a larger purpose.',
-  'Uttara Bhadrapada: Deep stability earned over time. Your wisdom comes from having genuinely lived.',
-  'Revati: The final nakshatra — compassion, completion, and the grace to help others safely cross to the next chapter.'
+  `Ashwini: A pioneer by nature — you arrive quickly and need to move quickly. Healing and new beginnings are your gifts.`,
+  `Bharani: You carry things — weight, responsibility, creative power. Endurance and transformation are yours.`,
+  `Krittika: Sharp discernment. You cut through illusion and demand authenticity from yourself and others.`,
+  `Rohini: A deep love of beauty, creativity, and the pleasures of the physical world. Magnetic and artistic.`,
+  `Mrigashira: A perpetual seeker — always searching, curious, never quite satisfied with what has already been found.`,
+  `Ardra: The storm that clears the air. You renew through disruption and possess a fierce, searching intelligence.`,
+  `Punarvasu: Return and restoration. You bounce back from difficulties and have a natural gift for teaching and guiding.`,
+  `Pushya: The nourisher. You are built to sustain others over long periods — patient, caring, deeply responsible.`,
+  `Ashlesha: Serpent wisdom. You see what others prefer not to see, and your intelligence works in subtle, penetrating ways.`,
+  `Magha: Royal spirit. You are connected to lineage, ancestry, and a sense of inherited dignity and purpose.`,
+  `Purva Phalguni: The art of enjoyment — rest, pleasure, creative luxury. You understand that joy is not a detour from life.`,
+  `Uttara Phalguni: The patron. You find meaning in generosity and in building things that benefit others over time.`,
+  `Hasta: Skilled hands and intuitive intelligence. You learn by doing and express love through practical craft.`,
+  `Chitra: Architectural vision and creative brilliance. You are driven to make something uniquely beautiful.`,
+  `Swati: Independence and flexibility — like wind, you resist being pinned down and find your own path naturally.`,
+  `Vishakha: Patient, burning ambition. You are willing to work toward a significant goal over a very long horizon.`,
+  `Anuradha: Steadfast devotion. You are one of the most loyal friends anyone can have, through long journeys.`,
+  `Jyeshtha: Seniority and protection. You take responsibility for those in your care with quiet authority.`,
+  `Mula: Root-seeking. You are willing to tear everything down to find the essential truth underneath.`,
+  `Purva Ashadha: Invincibility and revival. You can breathe life back into what seems lost — in yourself and others.`,
+  `Uttara Ashadha: Final victory. You achieve through righteousness and universally recognised principles.`,
+  `Shravana: The listener. You connect worlds through careful attention and the wisdom gained from true hearing.`,
+  `Dhanishtha: Rhythm and wealth through action. You move through life with a musical sense of timing.`,
+  `Shatabhisha: The healer of secrets. You carry vast knowledge and apply it with quiet, focused precision.`,
+  `Purva Bhadrapada: Fierce wisdom. You are willing to sacrifice comfort for a larger purpose.`,
+  `Uttara Bhadrapada: Deep stability earned over time. Your wisdom comes from having genuinely lived.`,
+  `Revati: The final nakshatra — compassion, completion, and the grace to help others safely cross to the next chapter.`
 ];
 
-// ── Mahadasha plain descriptions ──
+// ── Mahadasha descriptions ──
 const MD_DESCRIPTIONS = {
   Ketu: {
     name: 'The Release Chapter',
-    plain: 'Ketu's years strip away what no longer serves you and bring you face to face with deeper questions about who you are. External markers of success feel less meaningful. Spiritual interests may awaken, old identities fall away, and something more authentic begins to form underneath. This period can feel disorienting, but it is one of the most important passages for inner growth.',
+    plain: `Ketu's years strip away what no longer serves you and bring you face to face with deeper questions about who you are. External markers of success feel less meaningful. Spiritual interests may awaken, old identities fall away, and something more authentic begins to form underneath. This period can feel disorienting, but it is one of the most important passages for inner growth.`,
     keywords: 'Spirituality · Detachment · Inner work · Past karma surfacing'
   },
   Venus: {
     name: 'The Love & Pleasure Chapter',
-    plain: 'Venus brings her long, abundant period: relationships, beauty, creativity, and genuine enjoyment of life. Career paths in art, finance, beauty, or working with people tend to flourish. Love deepens or arrives. Material comfort often increases. This is one of the most personally fulfilling periods in the entire 120-year cycle — life invites you to savour it.',
+    plain: `Venus brings her long, abundant period: relationships, beauty, creativity, and genuine enjoyment of life. Career paths in art, finance, beauty, or working with people tend to flourish. Love deepens or arrives. Material comfort often increases. This is one of the most personally fulfilling periods in the entire 120-year cycle — life invites you to savour it.`,
     keywords: 'Love · Creativity · Beauty · Material comfort · Relationships'
   },
   Sun: {
     name: 'The Identity & Authority Chapter',
-    plain: 'A time of increasing clarity about who you are and what you stand for. Career advances through confidence and leadership. Relationships with authority figures — and your own sense of authority — come into focus. Your identity is tested and refined. Shorter than most periods but often pivotal for direction.',
+    plain: `A time of increasing clarity about who you are and what you stand for. Career advances through confidence and leadership. Relationships with authority figures — and your own sense of authority — come into focus. Your identity is tested and refined. Shorter than most periods but often pivotal for direction.`,
     keywords: 'Confidence · Leadership · Career · Clarity · Father figures'
   },
   Moon: {
     name: 'The Inner World Chapter',
-    plain: 'The Moon's decade brings the inner landscape to the foreground. What you feel matters more than what looks logical on paper. Home, family, and emotional connections deepen. Women — particularly mother figures — play significant roles. This is an emotionally rich and personally meaningful period, sometimes turbulent, always deeply human.',
+    plain: `The Moon's decade brings the inner landscape to the foreground. What you feel matters more than what looks logical on paper. Home, family, and emotional connections deepen. Women — particularly mother figures — play significant roles. This is an emotionally rich and personally meaningful period, sometimes turbulent, always deeply human.`,
     keywords: 'Emotions · Home · Family · Intuition · Inner life'
   },
   Mars: {
     name: 'The Drive & Action Chapter',
-    plain: 'Mars is the planet of energy, ambition, and change. This period is action-packed — you push hard toward goals and encounter resistance that forces growth. Property, competitive fields, and physical endeavours flourish. It is shorter than most but intense, often marking a turning point in how assertively you pursue what you want.',
+    plain: `Mars is the planet of energy, ambition, and change. This period is action-packed — you push hard toward goals and encounter resistance that forces growth. Property, competitive fields, and physical endeavours flourish. It is shorter than most but intense, often marking a turning point in how assertively you pursue what you want.`,
     keywords: 'Energy · Ambition · Drive · Property · Conflict resolved through action'
   },
   Rahu: {
     name: 'The Big Transformation Chapter',
-    plain: 'Rahu's 18 years are among the most dramatic in any life. Ambition surges, foreign connections form, social norms get broken, and significant upheaval brings growth. Major moves — geographic, professional, personal — are common. This period can bring extraordinary achievement alongside confusion about identity. The soul is learning something important it doesn't yet fully understand.',
+    plain: `Rahu's 18 years are among the most dramatic in any life. Ambition surges, foreign connections form, social norms get broken, and significant upheaval brings growth. Major moves — geographic, professional, personal — are common. This period can bring extraordinary achievement alongside confusion about identity. The soul is learning something important it doesn't yet fully understand.`,
     keywords: 'Ambition · Transformation · Foreign connections · Reinvention · Upheaval'
   },
   Jupiter: {
     name: 'The Growth & Wisdom Chapter',
-    plain: 'Jupiter's 16 years tend to bring expansion, opportunity, teachers, and genuine good fortune. Education, law, philosophy, and international connections flourish. Meaningful relationships form, children may arrive, and deep wisdom about life's larger patterns accumulates. This is widely considered the most naturally fortunate of all the major periods.',
+    plain: `Jupiter's 16 years tend to bring expansion, opportunity, teachers, and genuine good fortune. Education, law, philosophy, and international connections flourish. Meaningful relationships form, children may arrive, and deep wisdom about life's larger patterns accumulates. This is widely considered the most naturally fortunate of all the major periods.`,
     keywords: 'Expansion · Wisdom · Opportunity · Teachers · Good fortune'
   },
   Saturn: {
     name: 'The Structure & Patience Chapter',
-    plain: 'Saturn's long 19 years demand discipline, sustained effort, and patience. Results come — but slowly and in direct proportion to genuine effort. Career structures are built, responsibilities deepen, and health may need more attention. It is not an easy period emotionally, but what it builds is lasting. Those who work with Saturn's demands reach their greatest heights here.',
+    plain: `Saturn's long 19 years demand discipline, sustained effort, and patience. Results come — but slowly and in direct proportion to genuine effort. Career structures are built, responsibilities deepen, and health may need more attention. It is not an easy period emotionally, but what it builds is lasting. Those who work with Saturn's demands reach their greatest heights here.`,
     keywords: 'Discipline · Structure · Delayed rewards · Hard work · Lasting foundation'
   },
   Mercury: {
     name: 'The Mind & Communication Chapter',
-    plain: 'Mercury's 17 years reward intelligence, communication, commerce, and networking. Career breakthroughs come through writing, speaking, technology, and the ability to connect information and people. Siblings and immediate community come to the foreground. A busy, mentally engaged, opportunity-rich period for those who use their minds well.',
+    plain: `Mercury's 17 years reward intelligence, communication, commerce, and networking. Career breakthroughs come through writing, speaking, technology, and the ability to connect information and people. Siblings and immediate community come to the foreground. A busy, mentally engaged, opportunity-rich period for those who use their minds well.`,
     keywords: 'Communication · Learning · Commerce · Technology · Networking'
   }
 };
 
-// ── Antardasha (sub-period) modifier themes ──
+// ── Antardasha (sub-period) themes ──
 const AD_THEME = {
-  Ketu:    'Spirituality, detachment, and release come to the foreground. What no longer serves you may fall away — sometimes suddenly. Inner work and introspection are especially valuable now.',
-  Venus:   'Love, beauty, and creative expression flourish during this sub-period. Relationships tend to be pleasant and enriching, and material comforts often increase.',
-  Sun:     'Confidence and a clearer sense of identity and purpose strengthen. Career moves forward and recognition comes. Your relationship with authority — and your own authority — comes into focus.',
-  Moon:    'Emotions and home life take centre stage. Family and nurturing relationships call for attention. Intuition is heightened and emotional connections deepen.',
-  Mars:    'Energy and drive surge. This is a time to act on goals you\'ve been building toward. Some friction may arise — channel it productively rather than reactively.',
-  Rahu:    'Unexpected changes and ambitious impulses characterise this phase. Foreign influences, innovation, or breaking from convention brings growth. Stay grounded amid the movement.',
-  Jupiter: 'Opportunities for growth, learning, and good fortune open up. Travel, education, relationships, and spiritual development are highlighted. One of the more naturally fortunate sub-periods.',
-  Saturn:  'A slower, more structured sub-period. Results require patience and consistent effort. Health and responsibilities need attention. What you build now is built to last.',
-  Mercury: 'Communication, learning, and intellectual activity are front and centre. Networking, commerce, and written or spoken expression yield good results. A busy, mentally engaged time.'
+  Ketu:    `Spirituality, detachment, and release come to the foreground. What no longer serves you may fall away — sometimes suddenly. Inner work and introspection are especially valuable now.`,
+  Venus:   `Love, beauty, and creative expression flourish during this sub-period. Relationships tend to be pleasant and enriching, and material comforts often increase.`,
+  Sun:     `Confidence and a clearer sense of identity and purpose strengthen. Career moves forward and recognition comes. Your relationship with authority — and your own authority — comes into focus.`,
+  Moon:    `Emotions and home life take centre stage. Family and nurturing relationships call for attention. Intuition is heightened and emotional connections deepen.`,
+  Mars:    `Energy and drive surge. This is a time to act on goals you've been building toward. Some friction may arise — channel it productively rather than reactively.`,
+  Rahu:    `Unexpected changes and ambitious impulses characterise this phase. Foreign influences, innovation, or breaking from convention brings growth. Stay grounded amid the movement.`,
+  Jupiter: `Opportunities for growth, learning, and good fortune open up. Travel, education, relationships, and spiritual development are highlighted. One of the more naturally fortunate sub-periods.`,
+  Saturn:  `A slower, more structured sub-period. Results require patience and consistent effort. Health and responsibilities need attention. What you build now is built to last.`,
+  Mercury: `Communication, learning, and intellectual activity are front and centre. Networking, commerce, and written or spoken expression yield good results. A busy, mentally engaged time.`
 };
 
 // ╔═══════════════════════════════════════════╗
-// ║  ASTRONOMY                                ║
+// ║  ASTRONOMY  (geocentric, validated)       ║
 // ╚═══════════════════════════════════════════╝
 const R = Math.PI / 180;
+const normalize = d => ((d % 360) + 360) % 360;
 
 function julianDay(y, m, d, h) {
   if (m <= 2) { y--; m += 12; }
@@ -446,104 +492,141 @@ function julianDay(y, m, d, h) {
   return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + h / 24 + B - 1524.5;
 }
 
-function lahiriAyanamsha(JD) {
-  const T = (JD - 2451545.0) / 36525.0;
-  // Lahiri at J2000.0 ≈ 23.8531°, precessing at ~50.2388"/year = 1.395511°/century
-  return 23.8531 + T * 1.395511;
+function jdFromDate(date) { // JS Date (UTC) → Julian Day
+  return date.getTime() / 86400000 + 2440587.5;
 }
 
-function normalize(deg) { return ((deg % 360) + 360) % 360; }
+function lahiriAyanamsha(JD) {
+  const T = (JD - 2451545.0) / 36525.0;
+  return 23.85306 + T * 1.396042 + 0.000308 * T * T;
+}
 
+// ── Sun: apparent geocentric longitude (Meeus ch.25) ──
 function sunLongitude(JD) {
   const T = (JD - 2451545.0) / 36525.0;
   const L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
   const M = (357.52911 + 35999.05029 * T - 0.0001537 * T * T) * R;
-  const e = 0.016708634 - 0.000042037 * T;
   const C = (1.9146 - 0.004817 * T - 0.000014 * T * T) * Math.sin(M)
-           + (0.019993 - 0.000101 * T) * Math.sin(2 * M)
-           + 0.00029 * Math.sin(3 * M);
+          + (0.019993 - 0.000101 * T) * Math.sin(2 * M)
+          + 0.00029 * Math.sin(3 * M);
   const omega = (125.04 - 1934.136 * T) * R;
-  const apparent = L0 + C - 0.00569 - 0.00478 * Math.sin(omega);
-  return normalize(apparent);
+  return normalize(L0 + C - 0.00569 - 0.00478 * Math.sin(omega));
 }
 
+// ── Moon: Meeus ch.47, 32 principal terms (~0.01° accuracy) ──
 function moonLongitude(JD) {
   const T = (JD - 2451545.0) / 36525.0;
-  const T2 = T*T, T3=T2*T, T4=T3*T;
+  const T2 = T*T, T3 = T2*T, T4 = T3*T;
   const Lp = 218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000;
   const D  = 297.8501921 + 445267.1114034*T  - 0.0018819*T2 + T3/545868 - T4/113065000;
   const M  = 357.5291092 + 35999.0502909*T   - 0.0001536*T2 + T3/24490000;
   const Mp = 134.9633964 + 477198.8675055*T  + 0.0087414*T2 + T3/69699   - T4/14712000;
   const F  = 93.2720950  + 483202.0175233*T  - 0.0036539*T2 - T3/3526000 + T4/863310000;
   const e  = 1 - 0.002516*T - 0.0000074*T2;
-  // Top 20 longitude terms from Meeus Table 47.A [D,M,M',F,sigma_l]
   const terms = [
     [0,0,1,0,6288774],[2,0,-1,0,1274027],[2,0,0,0,658314],[0,0,2,0,213618],
     [0,1,0,0,-185116],[0,0,0,2,-114332],[2,0,-2,0,58793],[2,-1,-1,0,57066],
     [2,0,1,0,53322],[2,-1,0,0,45758],[0,1,-1,0,-40923],[1,0,0,0,-34720],
     [0,1,1,0,-30383],[2,0,0,-2,15327],[0,0,1,2,-12528],[0,0,1,-2,10980],
-    [4,0,-1,0,10675],[0,0,3,0,10034],[4,0,-2,0,8548],[2,1,-1,0,-7888]
+    [4,0,-1,0,10675],[0,0,3,0,10034],[4,0,-2,0,8548],[2,1,-1,0,-7888],
+    [2,1,0,0,-6766],[1,0,-1,0,-5163],[1,1,0,0,4987],[2,-1,1,0,4036],
+    [2,0,2,0,3994],[4,0,0,0,3861],[2,0,-3,0,3665],[0,1,-2,0,-2689],
+    [2,0,-1,2,-2602],[2,-1,-2,0,2390],[1,0,1,0,-2348],[2,-2,0,0,2236]
   ];
   let sumL = 0;
   for (const [td,tm,tmp,tf,c] of terms) {
     const arg = (td*D + tm*M + tmp*Mp + tf*F) * R;
-    let factor = c;
-    if (Math.abs(tm) === 1) factor *= e;
-    if (Math.abs(tm) === 2) factor *= e*e;
-    sumL += factor * Math.sin(arg);
+    let f = c;
+    if (Math.abs(tm) === 1) f *= e;
+    if (Math.abs(tm) === 2) f *= e*e;
+    sumL += f * Math.sin(arg);
   }
-  return normalize(Lp + sumL / 1000000);
+  const om = (125.04452 - 1934.136261*T) * R;
+  return normalize(Lp + sumL/1000000 - 0.00478 * Math.sin(om));
 }
 
-function planetLongitude(name, T) {
-  // Simplified orbital elements (Meeus Table 33.a, J2000.0)
-  const E = {
-    Mercury:[252.251,149472.675,77.456,0.20563],
-    Venus:  [181.979, 58517.816,131.564,0.00677],
-    Mars:   [355.433, 19140.299,336.041,0.09341],
-    Jupiter:[34.351,   3034.906, 14.331,0.04839],
-    Saturn: [50.077,   1222.114, 93.057,0.05415]
+// ── Planets: JPL approximate elements (Standish, 1800–2050 AD),
+//    full Kepler solve + Earth vector → true GEOCENTRIC longitude ──
+const ELEMENTS = {
+  Mercury:[0.38709927,0.00000037, 0.20563593,0.00001906, 7.00497902,-0.00594749, 252.25032350,149472.67411175, 77.45779628,0.16047689, 48.33076593,-0.12534081],
+  Venus:  [0.72333566,0.00000390, 0.00677672,-0.00004107, 3.39467605,-0.00078890, 181.97909950,58517.81538729, 131.60246718,0.00268329, 76.67984255,-0.27769418],
+  Earth:  [1.00000261,0.00000562, 0.01671123,-0.00004392,-0.00001531,-0.01294668, 100.46457166,35999.37244981, 102.93768193,0.32327364, 0,0],
+  Mars:   [1.52371034,0.00001847, 0.09339410,0.00007882, 1.84969142,-0.00813131, -4.55343205,19140.30268499, -23.94362959,0.44441088, 49.55953891,-0.29257343],
+  Jupiter:[5.20288700,-0.00011607,0.04838624,0.00013253, 1.30439695,-0.00183714, 34.39644051,3034.74612775, 14.72847983,0.21252668, 100.47390909,0.20469106],
+  Saturn: [9.53667594,-0.00125060,0.05386179,-0.00050991,2.48599187,0.00193609, 49.95424423,1222.49362201, 92.59887831,-0.41897216, 113.66242448,-0.28867794]
+};
+
+function helioVector(name, T) {
+  const [a0,ad,e0,ed,I0,Id,L0,Ld,w0,wd,O0,Od] = ELEMENTS[name];
+  const a = a0 + ad*T, e = e0 + ed*T, I = (I0 + Id*T)*R;
+  const L = L0 + Ld*T, wbar = w0 + wd*T, Odeg = O0 + Od*T, O = Odeg*R;
+  const w = (wbar - Odeg)*R;
+  let M = normalize(L - wbar)*R;
+  if (M > Math.PI) M -= 2*Math.PI;
+  let E = M + e*Math.sin(M);
+  for (let i = 0; i < 10; i++) {
+    const dE = (M - (E - e*Math.sin(E))) / (1 - e*Math.cos(E));
+    E += dE;
+    if (Math.abs(dE) < 1e-9) break;
+  }
+  const xp = a*(Math.cos(E)-e), yp = a*Math.sqrt(1-e*e)*Math.sin(E);
+  const cw=Math.cos(w),sw=Math.sin(w),cO=Math.cos(O),sO=Math.sin(O),cI=Math.cos(I),sI=Math.sin(I);
+  return {
+    x: (cw*cO - sw*sO*cI)*xp + (-sw*cO - cw*sO*cI)*yp,
+    y: (cw*sO + sw*cO*cI)*xp + (-sw*sO + cw*cO*cI)*yp,
+    z: (sw*sI)*xp + (cw*sI)*yp
   };
-  const [L0,dL,omega,e] = E[name];
-  const L = L0 + dL*T;
-  const M = (L - omega)*R;
-  const v = M + 2*e*Math.sin(M) + 1.25*e*e*Math.sin(2*M);
-  return normalize(omega + v/R);
 }
 
-function rahuLongitude(T) {
-  const omega = 125.0445479 - 1934.1362608*T + 0.0020754*T*T;
-  return normalize(omega);
+function planetGeoLongitude(name, JD) {
+  const T = (JD - 2451545.0)/36525.0;
+  const p = helioVector(name, T);
+  const e = helioVector('Earth', T);
+  return normalize(Math.atan2(p.y - e.y, p.x - e.x)/R);
 }
 
-function obliquity(T) {
-  return (23.439291 - 0.013004*T)*R;
+function isRetrograde(name, JD) {
+  const l1 = planetGeoLongitude(name, JD);
+  const l2 = planetGeoLongitude(name, JD + 1);
+  let diff = l2 - l1;
+  if (diff > 180) diff -= 360;
+  if (diff < -180) diff += 360;
+  return diff < 0;
+}
+
+function rahuLongitude(JD) {
+  const T = (JD - 2451545.0)/36525.0;
+  return normalize(125.0445479 - 1934.1362891*T + 0.0020754*T*T);
 }
 
 function ascendant(JD, lat, lon) {
   const T = (JD - 2451545.0) / 36525.0;
-  let GMST = 280.46061837 + 360.98564736629*(JD-2451545) + 0.000387933*T*T - T*T*T/38710000;
-  GMST = normalize(GMST);
-  const LST  = normalize(GMST + lon);
-  const RAMC = LST*R;
-  const eps  = obliquity(T);
-  const latR = lat*R;
+  const GMST = 280.46061837 + 360.98564736629*(JD-2451545) + 0.000387933*T*T - T*T*T/38710000;
+  const RAMC = normalize(GMST + lon)*R;
+  const eps = (23.439291 - 0.013004*T)*R;
   const y = -Math.cos(RAMC);
-  const x = Math.sin(RAMC)*Math.cos(eps) + Math.tan(latR)*Math.sin(eps);
-  return normalize(Math.atan2(y, x)/R);
+  const x = Math.sin(RAMC)*Math.cos(eps) + Math.tan(lat*R)*Math.sin(eps);
+  return normalize(Math.atan2(y, x)/R + 180);
 }
 
-// ── Planet strength (simplified) ──
-const EXALT = {Sun:1,Moon:2,Mars:10,Mercury:6,Jupiter:4,Venus:12,Saturn:7};
-const DEBI  = {Sun:7,Moon:8,Mars:4,Mercury:12,Jupiter:10,Venus:6,Saturn:1};
+// ── Dignity ──
+const EXALT = {Sun:1,Moon:2,Mars:10,Mercury:6,Jupiter:4,Venus:12,Saturn:7,Rahu:2,Ketu:8};
+const DEBI  = {Sun:7,Moon:8,Mars:4,Mercury:12,Jupiter:10,Venus:6,Saturn:1,Rahu:8,Ketu:2};
 const OWN   = {Sun:[5],Moon:[4],Mars:[1,8],Mercury:[3,6],Jupiter:[9,12],Venus:[2,7],Saturn:[10,11]};
+const SIGN_LORD = ['Mars','Venus','Mercury','Moon','Sun','Mercury','Venus','Mars','Jupiter','Saturn','Saturn','Jupiter'];
+const COMBUST_ORB = {Mercury:12,Venus:10,Mars:17,Jupiter:11,Saturn:15};
 
 function planetStrength(name, signIdx) {
   const si = signIdx + 1;
   if (EXALT[name] === si) return 'Exalted';
   if (DEBI[name] === si)  return 'Weakened';
-  if (OWN[name]  && OWN[name].includes(si)) return 'At home';
+  if (OWN[name] && OWN[name].includes(si)) return 'At home';
   return 'Neutral';
+}
+
+function angularSep(a, b) {
+  let d = Math.abs(normalize(a) - normalize(b));
+  return d > 180 ? 360 - d : d;
 }
 
 // ╔═══════════════════════════════════════════╗
@@ -571,13 +654,12 @@ function computeDashas(moonLon, birthDate) {
 }
 
 function computeADs(md) {
-  const {planet:mdP, start:mdStart, years:mdYrs} = md;
-  const idx = DASHA_ORDER.indexOf(mdP);
+  const idx = DASHA_ORDER.indexOf(md.planet);
   const ads = [];
-  let cur = new Date(mdStart);
+  let cur = new Date(md.start);
   for (let i=0; i<9; i++) {
     const adP = DASHA_ORDER[(idx+i)%9];
-    const yrs = (DASHA_YEARS[adP]/120)*mdYrs;
+    const yrs = (DASHA_YEARS[adP]/120)*md.years;
     const end = new Date(cur.getTime() + yrs*365.25*86400000);
     ads.push({planet:adP, start:new Date(cur), end, years:yrs});
     cur = end;
@@ -589,8 +671,7 @@ function findActivePeriod(dashas, date) {
   const t = date.getTime();
   for (const md of dashas) {
     if (t >= md.start.getTime() && t < md.end.getTime()) {
-      const ads = computeADs(md);
-      for (const ad of ads) {
+      for (const ad of computeADs(md)) {
         if (t >= ad.start.getTime() && t < ad.end.getTime()) return {md, ad};
       }
     }
@@ -604,7 +685,6 @@ function findActivePeriod(dashas, date) {
 function computeChart(year, month, day, hour, tzOffset, lat, lon) {
   const utHour = hour - tzOffset;
   const JD = julianDay(year, month, day, utHour);
-  const T  = (JD - 2451545.0)/36525.0;
   const ayan = lahiriAyanamsha(JD);
 
   const tropAsc = ascendant(JD, lat, lon);
@@ -612,9 +692,9 @@ function computeChart(year, month, day, hour, tzOffset, lat, lon) {
   const lagnaSign = Math.floor(sidAsc/30);
   const lagnaD    = sidAsc%30;
 
-  // Planets
+  const sunTrop = sunLongitude(JD);
   const planets = {};
-  const computePlanet = (name, tropLon) => {
+  const addPlanet = (name, tropLon, retro) => {
     const sid  = normalize(tropLon - ayan);
     const sign = Math.floor(sid/30);
     const deg  = sid%30;
@@ -622,19 +702,18 @@ function computeChart(year, month, day, hour, tzOffset, lat, lon) {
     const pada = Math.floor((sid%(360/27))/((360/27)/4))+1;
     const house= ((sign-lagnaSign+12)%12)+1;
     const strength = planetStrength(name, sign);
-    planets[name]={sid,sign,deg,nak:NAKSHATRAS[nakI],nakLord:NAK_LORDS[nakI],pada,house,strength};
+    const combust = COMBUST_ORB[name] ? angularSep(tropLon, sunTrop) < COMBUST_ORB[name] : false;
+    planets[name]={sid,sign,deg,nak:NAKSHATRAS[nakI],nakLord:NAK_LORDS[nakI],pada,house,strength,retro:!!retro,combust};
   };
 
-  computePlanet('Sun', sunLongitude(JD));
-  computePlanet('Moon', moonLongitude(JD));
-  computePlanet('Mars', planetLongitude('Mars',T));
-  computePlanet('Mercury', planetLongitude('Mercury',T));
-  computePlanet('Jupiter', planetLongitude('Jupiter',T));
-  computePlanet('Venus', planetLongitude('Venus',T));
-  computePlanet('Saturn', planetLongitude('Saturn',T));
-  const rahuTrop = rahuLongitude(T);
-  computePlanet('Rahu', rahuTrop);
-  computePlanet('Ketu', normalize(rahuTrop + 180));
+  addPlanet('Sun',  sunTrop, false);
+  addPlanet('Moon', moonLongitude(JD), false);
+  for (const p of ['Mercury','Venus','Mars','Jupiter','Saturn']) {
+    addPlanet(p, planetGeoLongitude(p, JD), isRetrograde(p, JD));
+  }
+  const rahuTrop = rahuLongitude(JD);
+  addPlanet('Rahu', rahuTrop, true);
+  addPlanet('Ketu', normalize(rahuTrop + 180), true);
 
   const nakI = Math.floor(planets.Moon.sid/(360/27));
 
@@ -642,15 +721,85 @@ function computeChart(year, month, day, hour, tzOffset, lat, lon) {
           moonNakIdx:nakI, moonNak:NAKSHATRAS[nakI], moonNakLord:NAK_LORDS[nakI]};
 }
 
+// ── Today's sidereal transits (for Sade Sati & Jupiter transit) ──
+function computeTransits(date) {
+  const JD = jdFromDate(date);
+  const ayan = lahiriAyanamsha(JD);
+  const sidSign = trop => Math.floor(normalize(trop - ayan)/30);
+  return {
+    saturnSign: sidSign(planetGeoLongitude('Saturn', JD)),
+    jupiterSign: sidSign(planetGeoLongitude('Jupiter', JD)),
+    rahuSign: sidSign(rahuLongitude(JD)),
+    saturnRetro: isRetrograde('Saturn', JD),
+    jupiterRetro: isRetrograde('Jupiter', JD)
+  };
+}
+
+// ╔═══════════════════════════════════════════╗
+// ║  YOGA DETECTION                           ║
+// ╚═══════════════════════════════════════════╝
+function detectYogas(chart) {
+  const {planets, lagnaSign} = chart;
+  const yogas = [];
+  const kendraHouses = [1,4,7,10];
+
+  // Pancha Mahapurusha yogas
+  const MAHAPURUSHA = {
+    Mars:   ['Ruchaka Yoga', `Mars is powerfully placed in an angular house in its own or exaltation sign. This classical yoga confers courage, physical vitality, and the makings of a natural commander — someone who wins through direct action.`],
+    Mercury:['Bhadra Yoga', `Mercury is powerfully placed in an angular house in its own or exaltation sign. This classical yoga confers sharp intellect, eloquence, and success through communication, analysis, and commerce.`],
+    Jupiter:['Hamsa Yoga', `Jupiter is powerfully placed in an angular house in its own or exaltation sign. This classical yoga confers wisdom, moral stature, and respect — a life protected by good judgement and good fortune.`],
+    Venus:  ['Malavya Yoga', `Venus is powerfully placed in an angular house in its own or exaltation sign. This classical yoga confers charm, artistic refinement, comfort, and fortunate relationships.`],
+    Saturn: ['Shasha Yoga', `Saturn is powerfully placed in an angular house in its own or exaltation sign. This classical yoga confers authority earned through discipline — leadership that grows with age and endures.`]
+  };
+  for (const [p,[nm,desc]] of Object.entries(MAHAPURUSHA)) {
+    const d = planets[p];
+    if (kendraHouses.includes(d.house) && (d.strength==='Exalted'||d.strength==='At home')) {
+      yogas.push({name:'✨ '+nm, desc});
+    }
+  }
+
+  // Gaja-Kesari: Jupiter in kendra from Moon
+  const jupFromMoon = ((planets.Jupiter.sign - planets.Moon.sign + 12)%12)+1;
+  if ([1,4,7,10].includes(jupFromMoon)) {
+    yogas.push({name:'✨ Gaja-Kesari Yoga', desc:`Jupiter stands in an angle from your Moon — the celebrated "elephant-lion" yoga. It is associated with lasting reputation, intelligence, and the respect of your community, growing stronger through the middle of life.`});
+  }
+
+  // Budha-Aditya: Sun + Mercury conjunct
+  if (planets.Sun.sign === planets.Mercury.sign) {
+    yogas.push({name:'✨ Budha-Aditya Yoga', desc:`Sun and Mercury share a sign in your chart. This union of soul and intellect gives analytical sharpness, administrative skill, and a mind that shines in professional settings.`});
+  }
+
+  // Chandra-Mangala: Moon + Mars conjunct or opposite
+  const moonMars = ((planets.Mars.sign - planets.Moon.sign + 12)%12)+1;
+  if (moonMars === 1 || moonMars === 7) {
+    yogas.push({name:'✨ Chandra-Mangala Yoga', desc:`Moon and Mars are linked in your chart — a combination known for entrepreneurial drive and the ability to generate resources through your own initiative. Emotional intensity, channelled well, becomes earning power.`});
+  }
+
+  // Lagna lord well placed
+  const lagnaLord = SIGN_LORD[lagnaSign];
+  const llHouse = planets[lagnaLord] ? planets[lagnaLord].house : null;
+  if (llHouse && [1,4,5,7,9,10].includes(llHouse)) {
+    yogas.push({name:'✨ Well-Placed Chart Lord', desc:`${lagnaLord}, the ruler of your rising sign, occupies the ${ORD[llHouse]} house — an angle or trine. This anchors the whole chart: whatever storms pass through, your life tends to reorganise itself around a clear sense of purpose.`});
+  }
+
+  // Kemadruma check (Moon isolated) — framed constructively
+  const moonSign = planets.Moon.sign;
+  const neighbors = Object.entries(planets).filter(([p,d]) =>
+    !['Moon','Sun','Rahu','Ketu'].includes(p) &&
+    [(moonSign+11)%12, moonSign, (moonSign+1)%12].includes(d.sign));
+  if (neighbors.length === 0) {
+    yogas.push({name:'☾ The Self-Reliant Moon', desc:`Your Moon stands alone, without planets beside it. Tradition calls this Kemadruma — modern experience calls it emotional self-reliance. You have had to learn to be your own anchor, and the inner strength that builds is real. Deliberate community and trusted confidants are your medicine.`});
+  }
+
+  return yogas;
+}
+
 // ╔═══════════════════════════════════════════╗
 // ║  READING GENERATION                       ║
 // ╚═══════════════════════════════════════════╝
-function fmtDate(d) {
-  return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-}
-function fmtDateShort(d) {
-  return d.toLocaleDateString('en-GB',{month:'short',year:'numeric'});
-}
+function fmtDate(d) { return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
+function fmtDateShort(d) { return d.toLocaleDateString('en-GB',{month:'short',year:'numeric'}); }
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 function ageAt(birthDate, d) {
   let age = d.getFullYear() - birthDate.getFullYear();
@@ -659,25 +808,43 @@ function ageAt(birthDate, d) {
   return age;
 }
 
+function placementNote(pName, d) {
+  let extra = '';
+  if (d.strength === 'Exalted') extra = ' It is exalted here — one of the strongest placements possible, marking this life area with exceptional promise.';
+  else if (d.strength === 'At home') extra = ' It sits in its own sign, lending steady, reliable strength.';
+  else if (d.strength === 'Weakened') extra = ' It is debilitated here, so this area asks for conscious effort — and often repays it with hard-won mastery.';
+  if (d.retro && pName !== 'Rahu' && pName !== 'Ketu') extra += ' Retrograde: its themes turn inward and often mature later in life, with unusual depth.';
+  if (d.combust) extra += ' Sitting close to the Sun (combust), its gifts can be overshadowed early on and reward deliberate cultivation.';
+  return `<div class="placement"><strong>${pName} in your ${ORD[d.house]} house</strong> — ${PLANET_ESSENCE[pName].charAt(0).toUpperCase()+PLANET_ESSENCE[pName].slice(1)} operate through the arena of ${HOUSE_THEMES[d.house]}.${extra}</div>`;
+}
+
+function dashaPersonalNote(planet, chart, prefix) {
+  const d = chart.planets[planet];
+  if (!d) return '';
+  let note = `${prefix}${planet} occupies your ${ORD[d.house]} house, so these themes play out especially through ${HOUSE_THEMES[d.house]}.`;
+  if (d.strength === 'Exalted') note += ` ${planet} is exalted in your chart — this period carries unusual promise.`;
+  else if (d.strength === 'At home') note += ` ${planet} is strong in its own sign — expect its gifts to flow with less resistance.`;
+  else if (d.strength === 'Weakened') note += ` ${planet} is debilitated natally, so progress here favours patience and humility over force.`;
+  return note;
+}
+
 function buildYearlyData(dashas, birthDate, fromYear, toYear) {
   const rows = [];
   for (let y = fromYear; y <= toYear; y++) {
-    const midDate = new Date(y, 6, 1); // July 1 midyear
+    const midDate = new Date(y, 6, 1);
     const active = findActivePeriod(dashas, midDate);
     if (!active) continue;
-    const {md, ad} = active;
-    rows.push({year:y, age:ageAt(birthDate, midDate), md, ad});
+    rows.push({year:y, age:ageAt(birthDate, midDate), md:active.md, ad:active.ad});
   }
   return rows;
 }
 
 function generateReading(name, chart, dashas, birthDate) {
   const today = new Date();
-  const {lagnaSign, lagnaSignName, planets, moonNakIdx, moonNak} = chart;
+  const {lagnaSign, lagnaSignName, planets, moonNakIdx} = chart;
   const moonSign = planets.Moon.sign;
   const active = findActivePeriod(dashas, today);
 
-  // ── PERSONALITY ──
   const personalityHTML = `
     <div class="section">
       <h2 class="section-title">✦ Who You Are</h2>
@@ -689,22 +856,38 @@ function generateReading(name, chart, dashas, birthDate) {
       </div>
     </div>`;
 
-  // ── BIRTH CHART ──
-  const chartHTML = buildChartHTML(name, chart);
-
-  // ── PLANET TABLE ──
+  const chartHTML = buildChartHTML(chart);
   const planetTableHTML = buildPlanetTable(chart);
 
-  // ── LIFE CHAPTERS (dasha timeline) ──
-  const chaptersHTML = buildChaptersHTML(dashas, birthDate, today);
+  // Yogas
+  const yogas = detectYogas(chart);
+  const yogasHTML = yogas.length ? `
+    <div class="section">
+      <h2 class="section-title">✦ Special Combinations in Your Chart</h2>
+      <p class="prose" style="margin-bottom:1.2rem;">Jyotish looks for "yogas" — meaningful planetary combinations that shape a life's signature strengths.</p>
+      <div class="yoga-grid">
+        ${yogas.map(y=>`<div class="yoga-card"><div class="yoga-name">${y.name}</div><div class="yoga-desc">${y.desc}</div></div>`).join('')}
+      </div>
+    </div>
+    <hr class="divider">` : '';
 
-  // ── YEAR-BY-YEAR ──
+  // Placements
+  const pOrder = ['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn','Rahu','Ketu'];
+  const placementsHTML = `
+    <div class="section">
+      <h2 class="section-title">✦ Where Your Planets Live</h2>
+      <p class="prose" style="margin-bottom:.5rem;">Each planet expresses itself through the house it occupies — the arena of life where its energy is spent.</p>
+      ${pOrder.map(p=>placementNote(p, planets[p])).join('')}
+    </div>`;
+
+  const chaptersHTML = buildChaptersHTML(dashas, birthDate, today, chart);
+
   const thisYear = today.getFullYear();
   const yearlyRows = buildYearlyData(dashas, birthDate, thisYear - 2, thisYear + 10);
-  const yearlyHTML = buildYearlyHTML(yearlyRows, today.getFullYear());
+  const yearlyHTML = buildYearlyHTML(yearlyRows, thisYear, chart);
 
-  // ── RIGHT NOW ──
-  const nowHTML = active ? buildNowHTML(active, today) : '';
+  const nowHTML = active ? buildNowHTML(active, today, chart) : '';
+  const transitsHTML = buildTransitsHTML(chart, today);
 
   return `
     ${personalityHTML}
@@ -715,6 +898,9 @@ function generateReading(name, chart, dashas, birthDate) {
       ${planetTableHTML}
     </div>
     <hr class="divider">
+    ${yogasHTML}
+    ${placementsHTML}
+    <hr class="divider">
     <div class="section">
       <h2 class="section-title">✦ Your Life Chapters</h2>
       <p class="prose" style="margin-bottom:1.2rem;">Vedic astrology divides life into major chapters called "dashas." Each is ruled by a planet that colours the themes, opportunities, and challenges of that period. Here are all the chapters in your life story.</p>
@@ -722,23 +908,21 @@ function generateReading(name, chart, dashas, birthDate) {
     </div>
     <hr class="divider">
     ${nowHTML}
+    ${transitsHTML}
     <div class="section">
       <h2 class="section-title">✦ Year by Year</h2>
-      <p class="prose" style="margin-bottom:1.2rem;">What the planetary rhythm brings each year — from two years ago through to ${thisYear + 10}. The ★ marks today.</p>
+      <p class="prose" style="margin-bottom:1.2rem;">What the planetary rhythm brings each year — from two years ago through to ${thisYear + 10}.</p>
       ${yearlyHTML}
-    </div>`;
+    </div>
+    <p class="form-footer" style="max-width:none;">This reading is generated from classical Jyotish principles for reflection and entertainment. The stars incline; they do not compel.</p>`;
 }
 
-function buildChartHTML(name, chart) {
+function buildChartHTML(chart) {
   const {lagnaSign, planets} = chart;
-  // Which planets are in each house?
   const houseMap = {};
   for (let h=1;h<=12;h++) houseMap[h]=[];
-  for (const [pName, pData] of Object.entries(planets)) {
-    houseMap[pData.house].push(pName);
-  }
+  for (const [pName, pData] of Object.entries(planets)) houseMap[pData.house].push(pName);
 
-  // Cell layout: [house, col, row]
   const layout = [
     [12,1,1],[1,2,1],[2,3,1],[3,4,1],
     [11,1,2],[4,4,2],
@@ -750,9 +934,8 @@ function buildChartHTML(name, chart) {
   for (const [h, col, row] of layout) {
     const signIdx = (lagnaSign + h - 1) % 12;
     const isLagna = h === 1;
-    const planetsHere = houseMap[h] || [];
-    const pTags = planetsHere.map(p =>
-      `<span class="pt ${PLANET_CLASS[p]}">${PLANET_ABBR[p]}</span>`
+    const pTags = (houseMap[h]||[]).map(p =>
+      `<span class="pt ${PLANET_CLASS[p]}">${PLANET_ABBR[p]}${planets[p].retro&&!['Rahu','Ketu'].includes(p)?'℞':''}</span>`
     ).join('');
 
     cells += `<div class="kc ${isLagna?'lagna-house':''}" style="grid-column:${col};grid-row:${row};">
@@ -770,7 +953,7 @@ function buildChartHTML(name, chart) {
     </div>
   </div>
   <p style="text-align:center;font-size:.75rem;color:var(--muted);margin-top:.5rem;">
-    ▲ Asc = Rising Sign (Lagna) &nbsp;|&nbsp;
+    ▲ Asc = Rising Sign (Lagna) &nbsp;|&nbsp; ℞ = retrograde &nbsp;|&nbsp;
     <span class="pt l" style="font-size:.7rem;padding:1px 5px;">Sun/Moon</span>
     <span class="pt b" style="font-size:.7rem;padding:1px 5px;">Benefic</span>
     <span class="pt m" style="font-size:.7rem;padding:1px 5px;">Malefic</span>
@@ -780,7 +963,8 @@ function buildChartHTML(name, chart) {
 
 function buildPlanetTable(chart) {
   const {planets, lagnaSignName, lagnaD} = chart;
-  const rows = [['Ascendant (Rising)', `${lagnaD.toFixed(1)}° ${lagnaSignName}`, '—', '—', 'Defines your personality & appearance']];
+  const ascNakI = Math.floor(normalize(chart.lagnaSign*30+chart.lagnaD)/(360/27));
+  const rows = [[`Ascendant`, `${lagnaD.toFixed(1)}° ${lagnaSignName}<br><span class="nak-small">${NAKSHATRAS[ascNakI]}</span>`, '—', '—', 'Personality & appearance']];
 
   const pOrder = ['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn','Rahu','Ketu'];
   const PLANET_ROLE = {
@@ -794,7 +978,16 @@ function buildPlanetTable(chart) {
     const d = planets[p];
     const st = d.strength;
     const cls = st==='Exalted'?'good':st==='Weakened'?'weak':'';
-    rows.push([p, `${d.deg.toFixed(1)}° ${SIGNS[d.sign]}`, `H${d.house}`, `<span class="${cls}">${st}</span>`, PLANET_ROLE[p]]);
+    const flags = [];
+    if (d.retro && !['Rahu','Ketu'].includes(p)) flags.push('<span class="rx">℞ retro</span>');
+    if (d.combust) flags.push('<span class="warn" style="font-size:.75rem;">combust</span>');
+    rows.push([
+      p + (d.retro&&!['Rahu','Ketu'].includes(p)?' <span class="rx">℞</span>':''),
+      `${d.deg.toFixed(1)}° ${SIGNS[d.sign]}<br><span class="nak-small">${d.nak} · pada ${d.pada}</span>`,
+      `H${d.house}`,
+      `<span class="${cls}">${st}</span>${flags.length?'<br>'+flags.join(' '):''}`,
+      PLANET_ROLE[p]
+    ]);
   }
 
   return `<div style="overflow-x:auto;margin-top:1.5rem;">
@@ -806,29 +999,31 @@ function buildPlanetTable(chart) {
   </table></div>`;
 }
 
-function buildChaptersHTML(dashas, birthDate, today) {
+function buildChaptersHTML(dashas, birthDate, today, chart) {
   let html = '<div class="timeline">';
   for (const md of dashas) {
-    if (md.end.getFullYear() < birthDate.getFullYear()) continue; // pre-birth
+    if (md.end.getFullYear() < birthDate.getFullYear()) continue;
     const isCurrent = today >= md.start && today < md.end;
     const isPast    = md.end <= today;
     const cls = isCurrent?'current':isPast?'past':'';
     const info = MD_DESCRIPTIONS[md.planet];
     const ageS = ageAt(birthDate, md.start);
     const ageE = ageAt(birthDate, md.end);
+    const personal = (!isPast) ? `<div class="tl-personal">${dashaPersonalNote(md.planet, chart, 'In your chart, ')}</div>` : '';
 
     html += `<div class="tl-item ${cls}">
       <div class="tl-dot"></div>
-      <div class="tl-label">${info.name}${isCurrent?' <span style="font-size:.7rem;color:#180838;background:var(--gold);border-radius:8px;padding:1px 7px;font-family:Inter,sans-serif;">NOW</span>':''}</div>
+      <div class="tl-label">${md.planet} — ${info.name}${isCurrent?' <span style="font-size:.7rem;color:#180838;background:var(--gold);border-radius:8px;padding:1px 7px;font-family:Inter,sans-serif;">NOW</span>':''}</div>
       <div class="tl-dates">${fmtDate(md.start)} → ${fmtDate(md.end)} &nbsp;·&nbsp; Ages ${ageS}–${ageE}</div>
       <div class="tl-desc">${isPast&&!isCurrent?`<em>${info.keywords}</em>`:info.plain}</div>
+      ${personal}
     </div>`;
   }
   html += '</div>';
   return html;
 }
 
-function buildYearlyHTML(rows, currentYear) {
+function buildYearlyHTML(rows, currentYear, chart) {
   let html = '<div class="year-grid">';
   for (const row of rows) {
     const {year, age, md, ad} = row;
@@ -837,13 +1032,14 @@ function buildYearlyHTML(rows, currentYear) {
     const cls    = isNow?'now':isSoon?'soon':'';
     const mdInfo = MD_DESCRIPTIONS[md.planet];
     const adTheme = AD_THEME[ad.planet];
+    const adNatal = chart.planets[ad.planet];
 
-    // Generate a sentence or two for this year
     let desc = '';
     if (year < currentYear) {
       desc = `${mdInfo.name}: ${ad.planet} influence. ${adTheme.split('.')[0]}.`;
     } else {
       desc = adTheme;
+      if (adNatal) desc += ` For you, ${ad.planet} sits in the ${ORD[adNatal.house]} house — the spotlight falls on ${HOUSE_THEMES[adNatal.house]}.`;
     }
 
     html += `<div class="year-card ${cls}">
@@ -862,24 +1058,55 @@ function buildYearlyHTML(rows, currentYear) {
   return html;
 }
 
-function buildNowHTML(active, today) {
+function buildNowHTML(active, today, chart) {
   const {md, ad} = active;
   const mdInfo = MD_DESCRIPTIONS[md.planet];
   const adTheme = AD_THEME[ad.planet];
+  const mdNote = dashaPersonalNote(md.planet, chart, 'In your chart, ');
+  const adNote = dashaPersonalNote(ad.planet, chart, 'Natally, ');
 
   return `<div class="section">
     <h2 class="section-title">✦ Right Now</h2>
     <div class="focus-card">
-      <div class="focus-planet">Your current life chapter: ${mdInfo.name}</div>
+      <div class="focus-planet">Your current life chapter: ${md.planet} — ${mdInfo.name}</div>
       <div class="focus-dates">Major period: ${fmtDate(md.start)} → ${fmtDate(md.end)}</div>
       <div class="focus-body">
         <p>${mdInfo.plain}</p>
+        <p><em>${mdNote}</em></p>
       </div>
     </div>
     <div class="focus-card" style="margin-top:1rem;background:linear-gradient(135deg,rgba(160,130,240,.08),rgba(245,215,122,.05));">
       <div class="focus-planet">Active sub-period: ${ad.planet}'s influence</div>
       <div class="focus-dates">${fmtDate(ad.start)} → ${fmtDate(ad.end)}</div>
-      <div class="focus-body"><p>${adTheme}</p></div>
+      <div class="focus-body"><p>${adTheme}</p><p><em>${adNote}</em></p></div>
+    </div>
+  </div>
+  <hr class="divider">`;
+}
+
+function buildTransitsHTML(chart, today) {
+  const tr = computeTransits(today);
+  const moonSign = chart.planets.Moon.sign;
+  const satFromMoon = ((tr.saturnSign - moonSign + 12)%12)+1;
+  const jupHouse = ((tr.jupiterSign - chart.lagnaSign + 12)%12)+1;
+
+  let satText = '';
+  if (satFromMoon === 12) satText = `<strong>Sade Sati — opening phase.</strong> Saturn is transiting the sign before your Moon. The famous seven-and-a-half-year passage has begun: expenses and background pressures rise first. Simplify, close open loops, and go steady — this phase clears the deck.`;
+  else if (satFromMoon === 1) satText = `<strong>Sade Sati — core phase.</strong> Saturn is transiting directly over your natal Moon, the most intense stretch of the seven-and-a-half-year passage. Responsibilities peak and emotional resilience is tested — but this is exactly where Saturn forges the maturity people later call your strength. Rest well, keep routines, honour commitments.`;
+  else if (satFromMoon === 2) satText = `<strong>Sade Sati — closing phase.</strong> Saturn has moved past your Moon into the sign after it. The heaviest stretch is behind you; what remains is consolidation, particularly around finances and family. The lessons of these years are becoming assets.`;
+  else if (satFromMoon === 4) satText = `<strong>Ardha-Kantaka.</strong> Saturn transits the 4th from your Moon — home, inner peace, and foundations ask for patient attention. A maintenance season, not a crisis.`;
+  else if (satFromMoon === 8) satText = `<strong>Ashtama Shani.</strong> Saturn transits the 8th from your Moon — a period of deep restructuring beneath the surface. Avoid unnecessary risks; transform deliberately.`;
+  else satText = `Saturn currently transits ${SIGNS[tr.saturnSign]}, the ${ORD[satFromMoon]} sign from your Moon — a comparatively settled Saturn phase. No Sade Sati pressure right now.`;
+  if (tr.saturnRetro) satText += ` (Saturn is currently retrograde — its lessons are in review mode.)`;
+
+  let jupText = `Jupiter currently moves through ${SIGNS[tr.jupiterSign]} — your ${ORD[jupHouse]} house. Its protection and growth touch ${HOUSE_THEMES[jupHouse]} this year.`;
+  if (tr.jupiterRetro) jupText += ` (Retrograde at the moment: growth consolidates inwardly before it shows outwardly.)`;
+
+  return `<div class="section">
+    <h2 class="section-title">✦ The Sky Right Now</h2>
+    <div class="yoga-grid">
+      <div class="yoga-card"><div class="yoga-name">♄ Saturn</div><div class="yoga-desc">${satText}</div></div>
+      <div class="yoga-card"><div class="yoga-name">♃ Jupiter</div><div class="yoga-desc">${jupText}</div></div>
     </div>
   </div>
   <hr class="divider">`;
@@ -894,9 +1121,8 @@ function showScreen(id) {
   window.scrollTo(0,0);
 }
 
-let loadingMsgs = ['Locating birthplace…','Computing planetary positions…','Casting your chart…','Reading the stars…'];
-let loadingIdx  = 0;
-let loadingTimer = null;
+const loadingMsgs = ['Locating birthplace…','Computing planetary positions…','Casting your chart…','Reading the stars…'];
+let loadingIdx = 0, loadingTimer = null;
 
 function startLoading() {
   showScreen('loading-screen');
@@ -907,17 +1133,52 @@ function startLoading() {
     document.getElementById('loading-msg').textContent = loadingMsgs[loadingIdx];
   }, 1800);
 }
-
-function stopLoading() {
-  clearInterval(loadingTimer);
-}
+function stopLoading() { clearInterval(loadingTimer); }
 
 async function geocode(place) {
+  // small localStorage cache to be polite to the free geocoding service
+  let cache = {};
+  try { cache = JSON.parse(localStorage.getItem('vs_geocache')||'{}'); } catch(e) {}
+  const key = place.toLowerCase().trim();
+  if (cache[key]) return cache[key];
+
   const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(place)}&format=json&limit=1`;
   const res = await fetch(url, {headers:{'Accept-Language':'en'}});
+  if (!res.ok) throw new Error('Geocoding failed');
   const data = await res.json();
   if (!data || !data.length) throw new Error('Place not found');
-  return {lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon), display: data[0].display_name};
+  const result = {lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon), display: data[0].display_name};
+  try {
+    cache[key] = result;
+    localStorage.setItem('vs_geocache', JSON.stringify(cache));
+  } catch(e) {}
+  return result;
+}
+
+function saveForm() {
+  try {
+    localStorage.setItem('vs_form', JSON.stringify({
+      name: document.getElementById('inp-name').value,
+      date: document.getElementById('inp-date').value,
+      time: document.getElementById('inp-time').value,
+      place: document.getElementById('inp-place').value,
+      tz: document.getElementById('inp-tz').value,
+      unknown: document.getElementById('time-unknown').checked
+    }));
+  } catch(e) {}
+}
+
+function restoreForm() {
+  try {
+    const f = JSON.parse(localStorage.getItem('vs_form')||'null');
+    if (!f) return;
+    if (f.name)  document.getElementById('inp-name').value = f.name;
+    if (f.date)  document.getElementById('inp-date').value = f.date;
+    if (f.time)  document.getElementById('inp-time').value = f.time;
+    if (f.place) document.getElementById('inp-place').value = f.place;
+    if (f.tz)    document.getElementById('inp-tz').value = f.tz;
+    document.getElementById('time-unknown').checked = !!f.unknown;
+  } catch(e) {}
 }
 
 async function submitForm() {
@@ -932,33 +1193,35 @@ async function submitForm() {
   const timeUnknown = document.getElementById('time-unknown').checked;
 
   if (!dateV) { errEl.textContent = 'Please enter your date of birth.'; return; }
-  if (!place)  { errEl.textContent = 'Please enter your place of birth.'; return; }
+  if (!place) { errEl.textContent = 'Please enter your place of birth.'; return; }
 
   const [year, month, day] = dateV.split('-').map(Number);
+  if (year < 1800 || year > 2049) { errEl.textContent = 'Please enter a birth year between 1800 and 2049.'; return; }
   let hour = 12;
   if (!timeUnknown && timeV) {
     const [h, m] = timeV.split(':').map(Number);
     hour = h + m/60;
   }
 
-  document.querySelector('.btn').disabled = true;
+  saveForm();
+  document.getElementById('submit-btn').disabled = true;
   startLoading();
 
   try {
     const {lat, lon, display} = await geocode(place);
 
     const chart = computeChart(year, month, day, hour, tz, lat, lon);
-    const birthDate = new Date(year, month-1, day);
+    const birthDate = new Date(year, month-1, day, timeUnknown?12:Math.floor(hour), timeUnknown?0:Math.round((hour%1)*60));
     const dashas = computeDashas(chart.planets.Moon.sid, birthDate);
 
     stopLoading();
 
-    const readingHTML = generateReading(name, chart, dashas, birthDate);
+    const readingHTML = generateReading(esc(name), chart, dashas, birthDate);
 
     const header = `
       <div class="reading-header">
-        <div class="reading-name">✨ ${name}'s Stars</div>
-        <div class="reading-birth">Born ${day} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][month-1]} ${year}${timeUnknown?'':', '+timeV} · ${display.split(',').slice(0,2).join(',').trim()}</div>
+        <div class="reading-name">✨ ${esc(name)}'s Stars</div>
+        <div class="reading-birth">Born ${day} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][month-1]} ${year}${timeUnknown?'':', '+esc(timeV)} · ${esc(display.split(',').slice(0,2).join(',').trim())}</div>
         <span class="badge">${chart.lagnaSignName} Rising</span>
         <span class="badge">Moon in ${SIGNS[chart.planets.Moon.sign]}</span>
         <span class="badge">${chart.moonNak}</span>
@@ -972,17 +1235,15 @@ async function submitForm() {
     errEl.textContent = 'Could not find that place — try being more specific (e.g. "Manila, Philippines").';
     console.error(e);
   } finally {
-    document.querySelector('.btn').disabled = false;
+    document.getElementById('submit-btn').disabled = false;
   }
 }
 
-// Allow Enter key on form
 document.addEventListener('keydown', e => {
   if (e.key==='Enter' && document.getElementById('form-screen').classList.contains('active')) submitForm();
 });
 
-// Pre-select UTC+8 for Philippines / common Asian timezone
-document.getElementById('inp-tz').value = '8';
+restoreForm();
 </script>
 </body>
 </html>
